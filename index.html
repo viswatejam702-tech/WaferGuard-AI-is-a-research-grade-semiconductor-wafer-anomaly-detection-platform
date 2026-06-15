@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WaferGuard AI | Semiconductor Anomaly Intelligence Platform</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+:root{
+--bg:#0b1120;
+--card:#111827;
+--accent:#00d9ff;
+--text:#ffffff;
+--secondary:#94a3b8;
+--success:#22c55e;
+--danger:#ef4444;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:linear-gradient(135deg,#020617,#0f172a,#111827);
+color:white;
+font-family:'Segoe UI',sans-serif;
+overflow-x:hidden;
+}
+
+.sidebar{
+position:fixed;
+left:0;
+top:0;
+width:250px;
+height:100vh;
+background:rgba(17,24,39,.95);
+backdrop-filter:blur(12px);
+padding:20px;
+z-index:1000;
+border-right:1px solid rgba(255,255,255,.05);
+}
+
+.logo{
+font-size:24px;
+font-weight:700;
+color:var(--accent);
+margin-bottom:40px;
+}
+
+.sidebar a{
+display:block;
+padding:14px;
+margin-bottom:10px;
+text-decoration:none;
+color:white;
+border-radius:12px;
+transition:.3s;
+}
+
+.sidebar a:hover{
+background:rgba(0,217,255,.15);
+}
+
+.main{
+margin-left:250px;
+padding:30px;
+}
+
+.glass{
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+border-radius:20px;
+}
+
+.kpi-card{
+padding:25px;
+height:170px;
+transition:.4s;
+}
+
+.kpi-card:hover{
+transform:translateY(-5px);
+}
+
+.kpi-icon{
+font-size:35px;
+color:var(--accent);
+}
+
+.kpi-number{
+font-size:36px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.kpi-title{
+color:var(--secondary);
+}
+
+.section-title{
+font-size:24px;
+font-weight:600;
+margin-bottom:20px;
+}
+
+.chart-box{
+height:450px;
+padding:15px;
+}
+
+.form-control{
+background:#0f172a;
+border:1px solid #334155;
+color:white;
+}
+
+.form-control:focus{
+background:#0f172a;
+color:white;
+border-color:var(--accent);
+box-shadow:none;
+}
+
+.btn-ai{
+background:linear-gradient(90deg,#00d9ff,#2563eb);
+border:none;
+padding:12px 20px;
+color:white;
+font-weight:600;
+border-radius:10px;
+}
+
+.result-box{
+display:none;
+}
+
+.prediction-normal{
+color:#22c55e;
+font-size:26px;
+font-weight:bold;
+}
+
+.prediction-anomaly{
+color:#ef4444;
+font-size:26px;
+font-weight:bold;
+}
+
+.footer{
+text-align:center;
+padding:30px;
+color:#94a3b8;
+}
+
+@media(max-width:991px){
+
+.sidebar{
+width:100%;
+height:auto;
+position:relative;
+}
+
+.main{
+margin-left:0;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+<i class="fa-solid fa-microchip"></i>
+WaferGuard AI
+</div>
+
+<a href="#dashboard">
+<i class="fa-solid fa-chart-line"></i>
+ Dashboard
+</a>
+
+<a href="#prediction">
+<i class="fa-solid fa-brain"></i>
+ Prediction
+</a>
+
+<a href="#analytics">
+<i class="fa-solid fa-chart-pie"></i>
+ Analytics
+</a>
+
+<a href="#research">
+<i class="fa-solid fa-flask"></i>
+ Research
+</a>
+
+<a href="#about">
+<i class="fa-solid fa-circle-info"></i>
+ About
+</a>
+
+</div>
+
+<div class="main">
+
+<h1 class="mb-4">
+Semiconductor Wafer Defect Intelligence Platform
+</h1>
+
+<div class="row">
+
+<div class="col-lg-4 mb-4">
+<div class="glass kpi-card">
+<div class="kpi-icon">
+<i class="fa-solid fa-database"></i>
+</div>
+<div class="kpi-number">
+{{total}}
+</div>
+<div class="kpi-title">
+Total Wafers
+</div>
+</div>
+</div>
+
+<div class="col-lg-4 mb-4">
+<div class="glass kpi-card">
+<div class="kpi-icon">
+<i class="fa-solid fa-triangle-exclamation"></i>
+</div>
+<div class="kpi-number">
+{{defects}}
+</div>
+<div class="kpi-title">
+Defective Wafers
+</div>
+</div>
+</div>
+
+<div class="col-lg-4 mb-4">
+<div class="glass kpi-card">
+<div class="kpi-icon">
+<i class="fa-solid fa-percent"></i>
+</div>
+<div class="kpi-number">
+{{defect_rate}}%
+</div>
+<div class="kpi-title">
+Defect Rate
+</div>
+</div>
+</div>
+
+</div>
+
+<div class="glass p-4 mb-4" id="prediction">
+
+<h3 class="mb-4">
+Real-Time Wafer Analysis
+</h3>
+
+<form id="predictForm">
+
+<div class="row">
+
+<div class="col-md-4 mb-3">
+<label>Temperature</label>
+<input type="number" step="any" name="temperature" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Pressure</label>
+<input type="number" step="any" name="pressure" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Gas Flow</label>
+<input type="number" step="any" name="gas" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Etch Rate</label>
+<input type="number" step="any" name="etch" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Voltage</label>
+<input type="number" step="any" name="voltage" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Current</label>
+<input type="number" step="any" name="current" class="form-control" required>
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Process Step</label>
+<input type="number" step="any" name="process" class="form-control" required>
+</div>
+
+</div>
+
+<button class="btn-ai">
+Analyze Wafer
+</button>
+
+</form>
+
+</div>
+
+<div class="glass p-4 mb-4 result-box" id="resultBox">
+
+<h3>AI Decision Engine</h3>
+
+<hr>
+
+<h5>
+Isolation Forest :
+<span id="iso"></span>
+</h5>
+
+<h5>
+One Class SVM :
+<span id="svm"></span>
+</h5>
+
+<h5>
+Risk Score :
+<span id="risk"></span>
+</h5>
+
+<h5>
+Anomaly Score :
+<span id="score"></span>
+</h5>
+
+<div id="finalDecision"></div>
+
+</div>
+
+<div class="row">
+
+<div class="col-lg-6 mb-4">
+<div class="glass chart-box">
+<h4>PCA Visualization</h4>
+<div id="pcaChart"></div>
+</div>
+</div>
+
+<div class="col-lg-6 mb-4">
+<div class="glass chart-box">
+<h4>Correlation Heatmap</h4>
+<div id="heatmapChart"></div>
+</div>
+</div>
+
+</div>
+
+<div class="glass p-4 mb-4">
+
+<h3>
+Research Highlights
+</h3>
+
+<ul>
+<li>Isolation Forest Anomaly Detection</li>
+<li>One-Class SVM Outlier Detection</li>
+<li>Z-Score Statistical Validation</li>
+<li>Semiconductor Quality Analytics</li>
+<li>Unsupervised Machine Learning</li>
+<li>Industrial Defect Detection</li>
+<li>PCA Feature Space Mapping</li>
+<li>Research-Grade Manufacturing Intelligence</li>
+</ul>
+
+</div>
+
+<div class="glass p-4">
+
+<h3>
+Technology Stack
+</h3>
+
+<div class="row text-center">
+
+<div class="col-md-3">
+<h5>Python</h5>
+</div>
+
+<div class="col-md-3">
+<h5>Flask</h5>
+</div>
+
+<div class="col-md-3">
+<h5>Scikit-Learn</h5>
+</div>
+
+<div class="col-md-3">
+<h5>Plotly</h5>
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+WaferGuard AI © 2026 | Semiconductor Defect Intelligence Platform
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("predictForm")
+.addEventListener("submit",async function(e){
+
+e.preventDefault();
+
+let formData=new FormData(this);
+
+let response=await fetch("/predict",{
+method:"POST",
+body:formData
+});
+
+let data=await response.json();
+
+document.getElementById("resultBox").style.display="block";
+
+document.getElementById("iso").innerHTML=
+data["Isolation Forest"];
+
+document.getElementById("svm").innerHTML=
+data["One Class SVM"];
+
+document.getElementById("risk").innerHTML=
+data["Risk Score"]+" %";
+
+document.getElementById("score").innerHTML=
+data["Anomaly Score"];
+
+if(data["Risk Score"]>=50){
+
+document.getElementById("finalDecision").innerHTML=
+"<div class='prediction-anomaly'>⚠ ANOMALY DETECTED</div>";
+
+}else{
+
+document.getElementById("finalDecision").innerHTML=
+"<div class='prediction-normal'>✓ NORMAL WAFER</div>";
+
+}
+
+});
+
+fetch("/pca")
+.then(response=>response.json())
+.then(data=>{
+
+Plotly.newPlot(
+'pcaChart',
+data.data,
+data.layout
+);
+
+});
+
+fetch("/heatmap")
+.then(response=>response.json())
+.then(data=>{
+
+Plotly.newPlot(
+'heatmapChart',
+data.data,
+data.layout
+);
+
+});
+
+</script>
+<div id="riskGauge"></div>
+
+<button
+class="btn-ai mt-3"
+onclick="exportResults()">
+Export Report
+</button>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

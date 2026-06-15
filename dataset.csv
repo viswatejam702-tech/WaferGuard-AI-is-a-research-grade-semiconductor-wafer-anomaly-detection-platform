@@ -1,0 +1,1 @@
+df = pd.read_csv( r"C:\ds and AI\ALL DATASETS\semiconductor_wafer_defect_dataset.csv")
