@@ -1,0 +1,2 @@
+# WaferGuard-AI-is-a-research-grade-semiconductor-wafer-anomaly-detection-platform
+WaferGuard AI is a research-grade semiconductor wafer anomaly detection platform built using Isolation Forest, One-Class SVM, Local Outlier Factor, Mahalanobis Distance, and Z-Score analytics. Features ensemble risk scoring, PCA visualization, correlation analysis, interactive dashboards, and advanced manufacturing quality intelligence.
