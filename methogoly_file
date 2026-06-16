@@ -1,0 +1,389 @@
+# Research-Grade Semiconductor Manufacturing Intelligence Framework
+
+## Project Overview
+
+This project presents a research-grade semiconductor wafer anomaly detection and manufacturing intelligence framework designed for advanced quality assurance and process monitoring. The framework integrates statistical methods, machine learning algorithms, dimensionality reduction techniques, and ensemble intelligence to identify abnormal manufacturing behavior, rank operational risks, and support proactive defect prevention.
+
+Unlike traditional threshold-based monitoring systems, this solution leverages multivariate anomaly detection and latent feature extraction to uncover hidden process deviations within semiconductor fabrication environments.
+
+---
+
+# Research Objectives
+
+The primary objectives of this study are:
+
+- Detect anomalous wafer manufacturing conditions.
+- Identify hidden process abnormalities.
+- Reduce dimensionality while preserving critical information.
+- Analyze latent manufacturing factors using Principal Component Analysis.
+- Compare multiple anomaly detection techniques.
+- Develop a robust ensemble risk scoring system.
+- Provide actionable manufacturing intelligence through visual analytics.
+
+---
+
+# Dataset Description
+
+The semiconductor wafer dataset contains process measurements collected during manufacturing operations.
+
+## Features
+
+| Feature | Description |
+|----------|-------------|
+| wafer_id | Unique wafer identifier |
+| temperature_c | Chamber temperature |
+| pressure_torr | Process pressure |
+| gas_flow_sccm | Gas flow rate |
+| etch_rate_nm_min | Etch rate |
+| voltage_v | Applied voltage |
+| current_ma | Current |
+| process_step | Manufacturing stage |
+| defect_label | Defect indicator |
+
+---
+
+# Feature Engineering
+
+Additional manufacturing intelligence features are created:
+
+## Power Consumption
+
+Power consumption is derived from:
+
+Power = Voltage × Current
+
+This feature captures electrical process behavior and helps identify abnormal energy patterns associated with wafer defects.
+
+## Process Step Encoding
+
+Categorical process stages are converted into numerical representations using Label Encoding.
+
+---
+
+# Data Standardization
+
+All numerical variables are standardized using StandardScaler.
+
+Standardization Formula:
+
+Z = (X − μ) / σ
+
+Where:
+
+- X = Feature value
+- μ = Mean
+- σ = Standard deviation
+
+This ensures equal contribution from all variables during dimensionality reduction and anomaly detection.
+
+---
+
+# Dimensionality Reduction
+
+## Principal Component Analysis (PCA)
+
+PCA transforms correlated manufacturing variables into orthogonal principal components that maximize retained variance.
+
+### Covariance Matrix
+
+The covariance matrix captures relationships between process variables:
+
+Cov(X)
+
+### Eigenvalue Decomposition
+
+The covariance matrix is decomposed into:
+
+Cov(X) = VΛVᵀ
+
+Where:
+
+- Λ = Eigenvalues
+- V = Eigenvectors
+
+### Eigenvalues
+
+Eigenvalues quantify the amount of variance captured by each principal component.
+
+### Eigenvectors
+
+Eigenvectors represent latent process directions within the manufacturing system.
+
+### Explained Variance Ratio
+
+Explained Variance Ratio:
+
+λᵢ / Σλ
+
+Used to determine the information retained by each component.
+
+### Cumulative Variance
+
+The optimal number of principal components is selected by preserving:
+
+95% Total Variance
+
+---
+
+# Loading Matrix Analysis
+
+The loading matrix measures feature contributions to principal components.
+
+High loading values indicate process variables that strongly influence latent manufacturing behavior.
+
+This analysis helps identify:
+
+- Critical process drivers
+- Dominant manufacturing factors
+- Root causes of abnormalities
+
+---
+
+# PCA Reconstruction Error
+
+A reconstruction-based anomaly score is computed:
+
+Reconstruction Error = Mean[(Original − Reconstructed)²]
+
+Anomalous wafers typically exhibit larger reconstruction errors because their process patterns cannot be effectively reconstructed by low-dimensional latent representations.
+
+---
+
+# Statistical Anomaly Detection
+
+## Z-Score Analysis
+
+Z-Score measures deviation from normal operating conditions.
+
+Formula:
+
+Z = (X − μ) / σ
+
+Threshold:
+
+|Z| > 3
+
+indicates potential anomalies.
+
+---
+
+## Mahalanobis Distance
+
+Mahalanobis Distance evaluates multivariate distance from the process centroid.
+
+Formula:
+
+D² = (x − μ)ᵀ S⁻¹ (x − μ)
+
+Where:
+
+- μ = Mean vector
+- S⁻¹ = Inverse covariance matrix
+
+Advantages:
+
+- Considers correlations between variables
+- Detects multivariate process abnormalities
+
+---
+
+# Machine Learning Anomaly Detection
+
+## Isolation Forest
+
+Isolation Forest isolates observations through recursive random partitioning.
+
+Characteristics:
+
+- Efficient on large datasets
+- Detects rare manufacturing deviations
+- Suitable for semiconductor process monitoring
+
+Parameters:
+
+- n_estimators = 500
+- contamination = 0.002
+- random_state = 42
+
+---
+
+## One-Class SVM
+
+One-Class Support Vector Machine learns the boundary of normal operating conditions.
+
+Characteristics:
+
+- Kernel-based anomaly detection
+- Effective for nonlinear process patterns
+
+Parameters:
+
+- Kernel = RBF
+- Gamma = Scale
+- Nu = 0.002
+
+---
+
+## Local Outlier Factor (LOF)
+
+LOF compares local density around each observation.
+
+Characteristics:
+
+- Detects density-based anomalies
+- Effective for local manufacturing abnormalities
+
+Parameters:
+
+- n_neighbors = 20
+- contamination = 0.002
+
+---
+
+# Ensemble Intelligence Framework
+
+To improve robustness, anomaly scores from multiple detectors are combined.
+
+## Ensemble Risk Formula
+
+Risk Score =
+
+0.25 × Isolation Forest Score
+
++ 0.20 × One-Class SVM Score
+
++ 0.15 × LOF Score
+
++ 0.15 × Mahalanobis Distance Score
+
++ 0.10 × Z-Score
+
++ 0.15 × PCA Reconstruction Error
+
+---
+
+# Risk Normalization
+
+Final scores are normalized:
+
+Risk = (Risk − Min) / (Max − Min)
+
+Output Range:
+
+0 – 100
+
+Where:
+
+- 0 = Lowest Risk
+- 100 = Highest Risk
+
+---
+
+# Ensemble Voting Strategy
+
+An observation is classified as anomalous when:
+
+Votes ≥ 3
+
+Voting Sources:
+
+- Z-Score
+- Mahalanobis Distance
+- Isolation Forest
+- One-Class SVM
+- Local Outlier Factor
+
+This reduces false positives and improves detection reliability.
+
+---
+
+# Research Evaluation
+
+The framework compares:
+
+- Z-Score
+- Mahalanobis Distance
+- Isolation Forest
+- One-Class SVM
+- Local Outlier Factor
+- PCA Reconstruction Error
+- Ensemble Intelligence
+
+Evaluation focuses on:
+
+- Number of detected anomalies
+- Risk ranking quality
+- Manufacturing interpretability
+- Process intelligence generation
+
+---
+
+# Visualization Components
+
+## PCA 2D Projection
+
+Visualizes latent manufacturing clusters.
+
+## PCA 3D Projection
+
+Provides three-dimensional process representation.
+
+## Correlation Heatmap
+
+Analyzes relationships among process variables.
+
+## Risk Distribution
+
+Displays anomaly concentration across the manufacturing environment.
+
+## Loading Matrix Heatmap
+
+Identifies dominant process drivers.
+
+## Feature Importance Dashboard
+
+Ranks manufacturing variables by contribution to risk.
+
+---
+
+# Business Impact
+
+This framework enables:
+
+- Early defect detection
+- Process drift identification
+- Yield optimization
+- Manufacturing risk assessment
+- Smart factory analytics
+- Industry 4.0 process intelligence
+
+---
+
+# Key Contributions
+
+- Research-grade anomaly detection architecture
+- Ensemble manufacturing risk engine
+- PCA-based latent factor analysis
+- Eigenvalue and eigenvector interpretation
+- Reconstruction-error anomaly scoring
+- Statistical and machine learning integration
+- Semiconductor manufacturing intelligence platform
+
+---
+
+# Future Research Directions
+
+- Autoencoder-Based Anomaly Detection
+- Variational Autoencoders (VAE)
+- Deep SVDD
+- Graph Neural Networks for Manufacturing Systems
+- Explainable AI (SHAP)
+- Real-Time Streaming Analytics
+- MLOps Pipeline Deployment
+- Predictive Yield Optimization
+
+---
+
+# Conclusion
+
+This study demonstrates a comprehensive semiconductor manufacturing intelligence framework that combines dimensionality reduction, statistical analysis, machine learning, and ensemble risk modeling. The resulting platform provides robust anomaly detection capabilities while delivering interpretable manufacturing insights suitable for industrial quality assurance and advanced analytics applications.
